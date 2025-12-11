@@ -12,9 +12,25 @@
 using Newtonsoft.Json.Linq;
 
 string json = 
-"{\"name\":\"Kris\",\"age\":30}";
+"{\"name\":\"MyDotNet\",\"since\":2016}";
 var obj = JObject.Parse(json);
 // Modify the JSON
-obj["age"] = 31;
-obj["city"] = "Vienna";
-Console.WriteLine(obj);
+obj["since"] = 2017;
+obj["city"] = "Mysuru";
+Console.WriteLine(obj.ToString());
+
+//Linq query example
+string usersJson =
+@"{ ""users"": [ { ""name"": ""MyDotNetUser1"", ""age"": 18 }, { ""name"": ""MyDotNetUser2"", ""age"": 25 } ] }";
+
+var obj1 = JObject.Parse(usersJson);
+var users = obj1["users"]?
+    .Children<JObject>()
+    .Where(u => ((int?)u["age"] ?? 0) >= 18)
+    .Select(u => (string?)u["name"])
+    .ToList() ?? new List<string?>();
+
+foreach (var user in users)
+{
+    Console.WriteLine(user);
+}

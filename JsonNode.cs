@@ -13,8 +13,25 @@ using System.Text.Json.Nodes;
 
 string json =
 "{\"name\":\"MyDotNet\",\"since\":2016}";
-var node = JsonNode.Parse(json);
+// ensure Parse returned a non-null node
+var node = JsonNode.Parse(json) ?? throw new InvalidOperationException("Failed to parse JSON.");
 // Modify the JSON
 node["since"] = 2017;
 node["city"] = "Mysuru";
 Console.WriteLine(node.ToJsonString());
+
+//Linq query example
+string usersJson =
+@"{ ""users"": [ { ""name"": ""MyDotNetUser1"", ""age"": 18 }, { ""name"": ""MyDotNetUser2"", ""age"": 25 } ] }";
+
+var root = JsonNode.Parse(usersJson);
+var users = root?["users"]?.AsArray()?
+    .Select(u => new { age = u?["age"]?.GetValue<int?>(), name = u?["name"]?.GetValue<string?>() })
+    .Where(x => (x.age ?? 0) >= 18 && x.name is not null)
+    .Select(x => x.name!)
+    .ToList() ?? new List<string>();
+
+foreach (var user in users)
+{
+    Console.WriteLine(user);
+}
